@@ -11,6 +11,16 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = surround_view_synthesis
 TEMPLATE = app
 
+QT_CONFIG -= no-pkg-config
+CONFIG += link_pkgconfig
+linux-oe-g++ {
+    PKGCONFIG += opencv
+}
+
+linux-g++ {
+    PKGCONFIG += /home/max/project/opencv-lib/lib/pkgconfig/opencv.pc
+}
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -25,10 +35,32 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    calibratewidget.cpp \
+    cameralistwidget.cpp \
+    cameraparameter.cpp \
+    cameraCalibrator.cpp \
+    extrinsicdialog.cpp \
+    extrinsiclabel.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    calibratewidget.h \
+    cameralistwidget.h \
+    cameraparameter.h \
+    cameraCalibrator.h \
+    extrinsicdialog.h \
+    extrinsiclabel.h
 
 FORMS += \
-        mainwindow.ui
+    calibratewidget.ui \
+    mainwindow.ui \
+    cameralistwidget.ui \
+    extrinsicdialog.ui
+
+RESOURCES += \
+    icons.qrc \
+    images.qrc
+
+target.path = /home/root/surround_view_synthesis
+INSTALLS += target

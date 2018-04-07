@@ -9,12 +9,24 @@ class CameraParameter
 {
 public:
     CameraParameter();
-    CameraParameter(const std::string &file, const std::string &camera);
-    void read(const std::string &file, const std::string &camera);
 
-    QMatrix3x3 intrinsic;
-    QVector4D distCoeffs;
-    QMatrix4x3 extrinsic;
+    QMatrix3x3 qIntrinsic;
+    QMatrix4x3 qExtrinsic;
+    QVector4D qDistCoeffs;
+
+    cv::Mat cvIntrinsic;
+    cv::Mat cvExtrinsic;
+    cv::Mat cvDistCoeffs;
+
+    bool intrinsicDistReady;
+    bool extrinsicReady;
+    QString name;
+    int devId;
+    static bool changed;
+
+    static cv::Size imgSize;
+    static cv::Size boardSize;
+    static float squareSize;
 };
 
 #endif // CAMERAPARAMETER_H

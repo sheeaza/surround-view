@@ -20,44 +20,37 @@ public:
     CameraCalibrator(QObject *parent = 0);
     ~CameraCalibrator();
 
-    void loadSetting(const string &filename);
-    void openCamera();
-    void closeCamera();
-
-    void getCvImage(Mat &image);
-    void getChessboardImage(Mat &image);
     void calibrateImage(Mat &distorImage, Mat &undistortImage);
+    void initCalibMap();
+    void cleanPoints();
+
+    Mat intrinsic;
+    Mat distCoeffs;
+    double totalAvgErr;
 
 signals:
-    void sendChessboardImage(bool found);
-    void sendCalibResults(bool ok, double totalAvgErr, double reproErr);
+    void isChessboardFound(bool found);
+    void sendCalibResults(bool ok);
 
 public slots:
-    void findAndDrawChessboard();
+    void findAndDrawChessboard(Mat *input);
     void calibrate();
-    void saveParams();
 
 private:
-    double computeReprojectionErrors(const vector<vector<Point3f> > &objectPoints,
+    inline double computeReprojectionErrors(const vector<vector<Point3f> > &objectPoints,
                                      const vector<vector<Point2f> > &imagePoints,
                                      const vector<Mat> &rvecs, const vector<Mat> &tvecs,
-                                     const Mat &cameraMatrix, const Mat &distCoeffs,
+                                     const Mat &intrinsic, const Mat &distCoeffs,
                                      vector<float> &perViewErrors);
-
-    QMutex mutex;
-    VideoCapture inputCapture;
-    int cameraID;
     Size boardSize;
     float squareSize;
-    string outputFileName;
+    Size imgSize;
+
     bool useCalibrate;
 
     Mat chessboardImage;
     vector<vector<Point2f> > imagePoints;
 
-    Mat cameraMatrix;
-    Mat distCoeffs;
-    double totalAvgErr;
     Mat map1, map2;
 };
 
