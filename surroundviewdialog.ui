@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ExtrinsicDialog</class>
- <widget class="QDialog" name="ExtrinsicDialog">
+ <class>SurroundViewDialog</class>
+ <widget class="QDialog" name="SurroundViewDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>647</width>
-    <height>455</height>
+    <width>795</width>
+    <height>533</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="exitButton">
+  <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>360</y>
-     <width>101</width>
+     <y>430</y>
+     <width>111</width>
      <height>71</height>
     </rect>
    </property>
@@ -30,44 +30,24 @@
      <normaloff>:/icon/icons8-back-50.png</normaloff>:/icon/icons8-back-50.png</iconset>
    </property>
   </widget>
-  <widget class="ExtrinsicLabel" name="imageLabel">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>20</y>
-     <width>421</width>
-     <height>281</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ExtrinsicLabel</class>
-   <extends>QLabel</extends>
-   <header>extrinsiclabel.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="icons.qrc"/>
  </resources>
  <connections>
   <connection>
-   <sender>exitButton</sender>
+   <sender>pushButton</sender>
    <signal>clicked()</signal>
-   <receiver>ExtrinsicDialog</receiver>
+   <receiver>SurroundViewDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>114</x>
-     <y>390</y>
+     <x>122</x>
+     <y>461</y>
     </hint>
     <hint type="destinationlabel">
-     <x>356</x>
-     <y>382</y>
+     <x>314</x>
+     <y>456</y>
     </hint>
    </hints>
   </connection>

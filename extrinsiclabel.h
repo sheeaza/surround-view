@@ -4,11 +4,11 @@
 #include <QLabel>
 #include <QRubberBand>
 
-class ImageLabel : public QLabel
+class ExtrinsicLabel : public QLabel
 {
     Q_OBJECT
 public:
-    explicit ImageLabel(QWidget *parent = nullptr);
+    explicit ExtrinsicLabel(QWidget *parent = nullptr);
 
 protected:
 //    void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;

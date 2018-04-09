@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 #include <QDir>
 #include <QFileInfo>
 
@@ -43,21 +44,29 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_intrinButton_clicked()
 {
-    intrinsicList = new CameraListWidget(CameraListWidget::intrinsic,
+    cameraList = new CameraListWidget(CameraListWidget::intrinsic,
                                          camParameters, this);
-    intrinsicList->setAttribute(Qt::WA_DeleteOnClose);
-    intrinsicList->setWindowTitle("Intrinsic List");
-    intrinsicList->exec();
+    cameraList->setAttribute(Qt::WA_DeleteOnClose);
+    cameraList->setWindowTitle("Intrinsic List");
+    cameraList->exec();
 }
 
 void MainWindow::on_extrinButton_clicked()
 {
-
+    cameraList = new CameraListWidget(CameraListWidget::extrinsic,
+                                         camParameters, this);
+    cameraList->setAttribute(Qt::WA_DeleteOnClose);
+    cameraList->setWindowTitle("Extrinsic List");
+    cameraList->exec();
 }
 
 void MainWindow::on_svButton_clicked()
 {
+    svDialog = new SurroundViewDialog(camParameters, this);
 
+    svDialog->setAttribute(Qt::WA_DeleteOnClose);
+    svDialog->setWindowTitle("Surround View");
+    svDialog->exec();
 }
 
 void MainWindow::save()

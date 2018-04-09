@@ -7,6 +7,7 @@
 
 #include "cameralistwidget.h"
 #include "cameraparameter.h"
+#include "surroundviewdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -35,7 +36,8 @@ private:
     bool intrinsicAllReady;
     bool extrinsicAllReady;
 
-    CameraListWidget *intrinsicList;
+    CameraListWidget *cameraList;
+    SurroundViewDialog *svDialog;
     QVector<CameraParameter> camParameters;
 
     const QString curFile;

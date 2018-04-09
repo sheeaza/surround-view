@@ -20,6 +20,7 @@ linux-oe-g++ {
 linux-g++ {
     PKGCONFIG += /home/max/project/opencv-lib/lib/pkgconfig/opencv.pc
 }
+PKGCONFIG += assimp
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -41,7 +42,13 @@ SOURCES += \
     cameraparameter.cpp \
     cameraCalibrator.cpp \
     extrinsicdialog.cpp \
-    extrinsiclabel.cpp
+    extrinsiclabel.cpp \
+    camera3d.cpp \
+    gpurender.cpp \
+    mesh.cpp \
+    model.cpp \
+    v4l2capture.cpp \
+    surroundviewdialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -50,17 +57,25 @@ HEADERS += \
     cameraparameter.h \
     cameraCalibrator.h \
     extrinsicdialog.h \
-    extrinsiclabel.h
+    extrinsiclabel.h \
+    camera3d.h \
+    gpurender.h \
+    mesh.h \
+    model.h \
+    v4l2capture.h \
+    surroundviewdialog.h
 
 FORMS += \
     calibratewidget.ui \
     mainwindow.ui \
     cameralistwidget.ui \
-    extrinsicdialog.ui
+    extrinsicdialog.ui \
+    surroundviewdialog.ui
 
 RESOURCES += \
     icons.qrc \
-    images.qrc
+    images.qrc \
+    shaders.qrc
 
 target.path = /home/root/surround_view_synthesis
 INSTALLS += target

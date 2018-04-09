@@ -1,14 +1,14 @@
-#include "imagelabel.h"
+#include "extrinsiclabel.h"
 
 #include <QMouseEvent>
 #include <QDebug>
 
-ImageLabel::ImageLabel(QWidget *parent) : QLabel(parent)
+ExtrinsicLabel::ExtrinsicLabel(QWidget *parent) : QLabel(parent)
 {
     rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }
 
-void ImageLabel::mousePressEvent(QMouseEvent *ev)
+void ExtrinsicLabel::mousePressEvent(QMouseEvent *ev)
 {
     originPos = ev->pos();
 //    qInfo() << originPos;
@@ -16,12 +16,12 @@ void ImageLabel::mousePressEvent(QMouseEvent *ev)
     rubberBand->show();
 }
 
-void ImageLabel::mouseMoveEvent(QMouseEvent *ev)
+void ExtrinsicLabel::mouseMoveEvent(QMouseEvent *ev)
 {
     rubberBand->setGeometry(QRect(originPos, ev->pos()).normalized());
 }
 
-void ImageLabel::mouseReleaseEvent(QMouseEvent *ev)
+void ExtrinsicLabel::mouseReleaseEvent(QMouseEvent *ev)
 {
     rubberBand->hide();
     endPos = ev->pos();
