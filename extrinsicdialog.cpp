@@ -158,38 +158,32 @@ void ExtrinsicDialog::makeExtrinsic()
     }
 
     float alpha = 1.0/36;
-//    cv::Point3f t3(0.0, 0.145, 0.0);
+
     cv::Point3f t3(0.0, 0.0, 0.0);
     for(uint i = 0; i < objPoints.size(); i++) {
         objPoints[i] = (objPoints[i] - t3)*alpha;
     }
 
-//    std::cout << subCorners << std::endl;
+    cv::Mat intrinsicTmp;
+    cv::Mat scale = cv::Mat::eye(3, 3, CV_64F);
+    scale.at<double>(0, 0) = camPara.imgSize.width;
+    scale.at<double>(1, 1) = camPara.imgSize.height;
+    camPara.cvIntrinsic.copyTo(intrinsicTmp);
+    intrinsicTmp = scale * intrinsicTmp;
 
-//    cv::Mat intrinsicTmp;
-//    cv::Mat scale = cv::Mat::eye(3, 3, CV_64F);
-//    scale.at<double>(0, 0) = camPara.imgSize.width;
-//    scale.at<double>(1, 1) = camPara.imgSize.height;
-//    camPara.cvIntrinsic.copyTo(intrinsicTmp);
-//    intrinsicTmp = scale * intrinsicTmp;
-//    std::cout << intrinsicTmp << std::endl;
+    std::vector<cv::Point2f> undistps;
+    cv::fisheye::undistortPoints(subCorners, undistps,
+                                 intrinsicTmp, camPara.cvDistCoeffs);
 
-//    std::vector<cv::Point2f> undistps;
-//    cv::fisheye::undistortPoints(subCorners, undistps,
-//                                 camPara.cvIntrinsic, camPara.cvDistCoeffs);
-
-//    std::cout << undistps << std::endl;
-
-    for(uint i = 0; i < subCorners.size(); ++i) {
-        subCorners[i].x = subCorners[i].x / (camPara.imgSize.width - 1);
-        subCorners[i].y = subCorners[i].y / (camPara.imgSize.height - 1);
-    }
+//    for(uint i = 0; i < subCorners.size(); ++i) {
+//        subCorners[i].x = subCorners[i].x / (camPara.imgSize.width - 1);
+//        subCorners[i].y = subCorners[i].y / (camPara.imgSize.height - 1);
+//    }
 
     cv::Mat rvec, tvec, rmat, extrinsic;
-    cv::solvePnP(objPoints, subCorners, camPara.cvIntrinsic,
-                 camPara.cvDistCoeffs, rvec, tvec);
-//    cv::solvePnP(objPoints, undistps, camPara.cvIntrinsic,
-//                 cv::Mat(), rvec, tvec);
+
+    cv::solvePnP(objPoints, undistps, cv::Mat::eye(3, 3, CV_64F),
+                 cv::Mat(), rvec, tvec);
     cv::Rodrigues(rvec, rmat);
     cv::hconcat(rmat, tvec, extrinsic);
     extrinsic.copyTo(camPara.cvExtrinsic);
