@@ -29,15 +29,13 @@ class GpuRender : public QOpenGLWidget, protected QOpenGLExtraFunctions
     Q_OBJECT
 
 public:
-   explicit GpuRender(QVector<CameraParameter> &p, QWidget *parent = 0);
+   explicit GpuRender(QWidget *parent = 0);
     ~GpuRender();
 
     void allocate_buffer(uint num);
     void setBuf(QVector<V4l2Capture::CapBuffers *> &pbuf);
-    void setTextureSize(QSize &s);
     void enablePaint();
     void setCameraPara(QVector<CameraParameter> &p);
-    void grabGestures(const QList<Qt::GestureType> &gestures);
 
 public slots:
 
@@ -45,15 +43,11 @@ protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
-
     bool event(QEvent *e) Q_DECL_OVERRIDE;
 
 #define PLANES 4
 
 private:
-    bool gestureEvent(QGestureEvent *e);
-
-
     typedef void (GL_APIENTRY *PFNGLTEXDIRECTVIVMAP)
                  (GLenum Target, GLsizei Width, GLsizei Height,
                   GLenum Format, GLvoid ** Logical, const GLuint *Physical);
@@ -63,7 +57,7 @@ private:
 
     QVector<QString> cameraNames;
     QVector<Model*> objModels;
-    QVector<CameraParameter> &camParas;
+    QVector<CameraParameter> *camParas;
 
     QSize textureSize;
     GLuint textureCam;

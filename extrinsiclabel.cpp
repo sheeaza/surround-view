@@ -1,4 +1,5 @@
 #include "extrinsiclabel.h"
+#include "cameraparameter.h"
 
 #include <QMouseEvent>
 #include <QDebug>

@@ -22,11 +22,13 @@ public:
 public slots:
     void animate();
 
+protected:
+    void mouseDoubleClickEvent(QMouseEvent *event);
+
 private:
     void initQParameters();
 
     Ui::SurroundViewDialog *ui;
-    GpuRender *renderWidget;
     QVector<V4l2Capture *> v4l2Cap;
     QVector<CameraParameter> &camParas;
 };

@@ -26,12 +26,17 @@ public:
                               QWidget *parent = 0);
     ~CameraListWidget();
 
+protected:
+    void mouseDoubleClickEvent(QMouseEvent *event);
+
 private slots:
 
 private:
+    void setCalibrateStatus(QLabel *label, CameraParameter *p,
+                            bool ready);
+
     Ui::CameraListWidget *ui;
     QVector<CameraParameter> &pvec;
-    QVector<QLabel *> camInfoVec;
 };
 
 #endif // CAMERALIST_H

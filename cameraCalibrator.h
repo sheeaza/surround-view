@@ -9,6 +9,8 @@
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 
+#include "cameraparameter.h"
+
 using namespace cv;
 using namespace std;
 
@@ -17,7 +19,7 @@ class CameraCalibrator : public QObject
     Q_OBJECT
 
 public:
-    CameraCalibrator(QObject *parent = 0);
+    CameraCalibrator(CameraParameter &p, QObject *parent = 0);
     ~CameraCalibrator();
 
     void calibrateImage(Mat &distorImage, Mat &undistortImage);

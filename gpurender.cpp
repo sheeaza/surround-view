@@ -28,11 +28,11 @@
 #define GL_CLAMP_TO_BORDER_VIV         0x812D
 #endif
 
-GpuRender::GpuRender(QVector<CameraParameter> &p, QWidget *parent) :
+GpuRender::GpuRender(QWidget *parent) :
     QOpenGLWidget(parent),
     pFNglTexDirectVIVMap(NULL),
     pFNglTexDirectInvalidateVIV(NULL),
-    camParas(p),
+    camParas(NULL),
     m_program(0),
     pblockBuf(NULL),
     paintFlag(false)
@@ -102,21 +102,14 @@ void GpuRender::setBuf(QVector<V4l2Capture::CapBuffers *> &pbuf)
     //    }
 }
 
-void GpuRender::setTextureSize(QSize &s)
-{
-    textureSize = QSize(s);
-}
-
 void GpuRender::enablePaint()
 {
     paintFlag = 1;
 }
 
-void GpuRender::grabGestures(const QList<Qt::GestureType> &gestures)
+void GpuRender::setCameraPara(QVector<CameraParameter> &p)
 {
-    foreach (Qt::GestureType gesture, gestures) {
-        grabGesture(gesture);
-    }
+    camParas = &p;
 }
 
 static const GLint eglTexture[4] = {
@@ -327,10 +320,10 @@ void GpuRender::paintGL()
             glBindTexture(GL_TEXTURE_2D, maskTextureID[i]);
 
             m_program->bind();
-            m_program->setUniformValue("intrinsic", camParas.at(i).qIntrinsic);
-            m_program->setUniformValue("distCoeffs", camParas.at(i).qDistCoeffs);
+            m_program->setUniformValue("intrinsic", camParas->at(i).qIntrinsic);
+            m_program->setUniformValue("distCoeffs", camParas->at(i).qDistCoeffs);
             glUniformMatrix4x3fv(extrinsicLoc, 1, GL_FALSE,
-                                 camParas.at(i).qExtrinsic.data());
+                                 camParas->at(i).qExtrinsic.data());
             objModels.at(i)->Draw(programId);
         }
     }
@@ -346,9 +339,6 @@ void GpuRender::resizeGL(int w, int h)
 
 bool GpuRender::event(QEvent *e)
 {
-    if(e->type() == QEvent::Gesture) {
-        return gestureEvent(static_cast<QGestureEvent*>(e));
-    }
     if(e->type() == QEvent::TouchBegin) {
         return true;
     }
@@ -379,15 +369,4 @@ bool GpuRender::event(QEvent *e)
     }
 
     return QOpenGLWidget::event(e);
-}
-
-bool GpuRender::gestureEvent(QGestureEvent *e)
-{
-    if(QGesture *swipe = e->gesture(Qt::SwipeGesture)) {
-//        qInfo() << "swipe";
-    } else if(QGesture *pinch = e->gesture(Qt::PinchGesture)) {
-//        qInfo() << "pinch";
-    }
-
-    return true;
 }

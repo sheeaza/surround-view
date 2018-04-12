@@ -29,6 +29,8 @@ private slots:
     void on_svButton_clicked();
 
 private:
+    void svButtonEnable();
+
     void save();
     void load();
 

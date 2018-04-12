@@ -1,5 +1,6 @@
 #include "surroundviewdialog.h"
 #include "ui_surroundviewdialog.h"
+#include "aspectsinglelayout.h"
 
 SurroundViewDialog::SurroundViewDialog(QVector<CameraParameter> &p, QWidget *parent) :
     QDialog(parent),
@@ -9,19 +10,25 @@ SurroundViewDialog::SurroundViewDialog(QVector<CameraParameter> &p, QWidget *par
     ui->setupUi(this);
 
     initQParameters();
-    renderWidget = new GpuRender(camParas, this);
-    renderWidget->setGeometry(QRect(110, 20, 720, 480));
+    ui->renderWidget->setCameraPara(camParas);
+
+    AspectSingleLayout *aspLayout =
+            new AspectSingleLayout(NULL, camParas.at(0).imageWidthToHeight);
+    ui->gridLayout->addLayout(aspLayout, 0, 0);
+    aspLayout->setContentsMargins(0, 0, 0, 0);
+    aspLayout->addWidget(ui->renderWidget);
+    aspLayout->setAlignment(ui->renderWidget, Qt::AlignCenter);
 
     V4l2Capture::ImgFormat fmt;
-    fmt.height = CameraParameter::imgSize.height;
-    fmt.width = CameraParameter::imgSize.width;
+    fmt.height = camParas.at(0).imgSize.height;
+    fmt.width = camParas.at(0).imgSize.width;
     fmt.pixFmt = V4l2Capture::UYVY;
     for (auto &item : camParas) {
         V4l2Capture *cap = new V4l2Capture(item.devId, fmt);
         cap->startCapturing();
         v4l2Cap.append(cap);
     }
-    renderWidget->allocate_buffer(v4l2Cap.size());
+    ui->renderWidget->allocate_buffer(v4l2Cap.size());
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &SurroundViewDialog::animate);
@@ -40,17 +47,28 @@ void SurroundViewDialog::animate()
 {
     QVector<V4l2Capture::CapBuffers *> buf(v4l2Cap.size());
 
-    renderWidget->enablePaint();
+    ui->renderWidget->enablePaint();
 
     for(int i = 0; i < v4l2Cap.size(); i++) {
         v4l2Cap.at(i)->getFrame(&buf[i]);
     }
-    renderWidget->setBuf(buf);
+    ui->renderWidget->setBuf(buf);
 
-    renderWidget->update();
+    ui->renderWidget->update();
 
     foreach (auto &item, v4l2Cap) {
         item->doneFrame();
+    }
+}
+
+void SurroundViewDialog::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+
+    if(isMaximized()) {
+        showNormal();
+    } else {
+        showMaximized();
     }
 }
 

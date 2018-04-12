@@ -1,5 +1,8 @@
 #include "calibratewidget.h"
 #include "ui_calibratewidget.h"
+#include "aspectsinglelayout.h"
+
+#include <QResizeEvent>
 
 CalibrateWidget::CalibrateWidget(CameraParameter &p, QWidget *parent) :
     QDialog(parent),
@@ -17,13 +20,22 @@ CalibrateWidget::CalibrateWidget(CameraParameter &p, QWidget *parent) :
     capture.set(CAP_PROP_FRAME_WIDTH, camPara.imgSize.width);
     capture.set(CAP_PROP_FRAME_HEIGHT, camPara.imgSize.height);
 
-    camCalib = new CameraCalibrator;
+    AspectSingleLayout *aspLaout_1 =
+            new AspectSingleLayout(NULL, camPara.imageWidthToHeight);
+    ui->gridLayout_2->addLayout(aspLaout_1, 0, 0);
+    aspLaout_1->addWidget(ui->srcImageLabel);
+    aspLaout_1->setAlignment(ui->srcImageLabel, Qt::AlignCenter);
 
+    AspectSingleLayout *aspLaout_2 =
+            new AspectSingleLayout(NULL, camPara.imageWidthToHeight);
+    ui->gridLayout_2->addLayout(aspLaout_2, 1, 0);
+    aspLaout_2->addWidget(ui->dstImageLabel);
+    aspLaout_2->setAlignment(ui->dstImageLabel, Qt::AlignCenter);
+
+    camCalib = new CameraCalibrator(camPara);
     captureTimer = new QTimer(this);
-
     connect(captureTimer, &QTimer::timeout,
             this, &CalibrateWidget::cameraTimeout);
-
     connect(this, &CalibrateWidget::sendSrcImage,
             camCalib, &CameraCalibrator::findAndDrawChessboard);
     connect(camCalib, &CameraCalibrator::isChessboardFound,
@@ -54,6 +66,17 @@ CalibrateWidget::~CalibrateWidget()
 {
     delete ui;
     calibThread.quit();
+}
+
+void CalibrateWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+
+    if(isMaximized()) {
+        showNormal();
+    } else {
+        showMaximized();
+    }
 }
 
 void CalibrateWidget::on_captureButton_clicked()

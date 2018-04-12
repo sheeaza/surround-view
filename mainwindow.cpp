@@ -49,6 +49,7 @@ void MainWindow::on_intrinButton_clicked()
     cameraList->setAttribute(Qt::WA_DeleteOnClose);
     cameraList->setWindowTitle("Intrinsic List");
     cameraList->exec();
+    svButtonEnable();
 }
 
 void MainWindow::on_extrinButton_clicked()
@@ -58,6 +59,7 @@ void MainWindow::on_extrinButton_clicked()
     cameraList->setAttribute(Qt::WA_DeleteOnClose);
     cameraList->setWindowTitle("Extrinsic List");
     cameraList->exec();
+    svButtonEnable();
 }
 
 void MainWindow::on_svButton_clicked()
@@ -67,6 +69,15 @@ void MainWindow::on_svButton_clicked()
     svDialog->setAttribute(Qt::WA_DeleteOnClose);
     svDialog->setWindowTitle("Surround View");
     svDialog->exec();
+}
+
+void MainWindow::svButtonEnable()
+{
+    bool enable(1);
+    for(auto &item : camParameters) {
+        enable = enable & item.intrinsicDistReady & item.extrinsicReady;
+    }
+    ui->svButton->setEnabled(enable);
 }
 
 void MainWindow::save()
@@ -112,6 +123,9 @@ void MainWindow::load()
     n = fs["imageResolution"];
     n["width"] >> CameraParameter::imgSize.width;
     n["height"] >> CameraParameter::imgSize.height;
+    float w = CameraParameter::imgSize.width;
+    float h = CameraParameter::imgSize.height;
+    CameraParameter::imageWidthToHeight = w / h;
 
     n = fs["parameters"];
 

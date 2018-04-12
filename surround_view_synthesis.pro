@@ -63,7 +63,8 @@ HEADERS += \
     mesh.h \
     model.h \
     v4l2capture.h \
-    surroundviewdialog.h
+    surroundviewdialog.h \
+    aspectsinglelayout.h
 
 FORMS += \
     calibratewidget.ui \
@@ -74,7 +75,6 @@ FORMS += \
 
 RESOURCES += \
     icons.qrc \
-    images.qrc \
     shaders.qrc
 
 target.path = /home/root/surround_view_synthesis

@@ -20,8 +20,12 @@ public:
                              CameraParameter &p, QWidget *parent = 0);
     ~ExtrinsicDialog();
 
+protected:
+    void mouseDoubleClickEvent(QMouseEvent *event);
+
 private slots:
     void findChessboardCorners(const QPoint&, const QPoint&);
+    void on_resetButton_clicked();
 
 private:
     void makeExtrinsic();
@@ -29,10 +33,6 @@ private:
     Ui::ExtrinsicDialog *ui;
     CameraParameter &camPara;
     cv::Mat srcImage;
-    float scaleFactor;
-    bool found;
-    QSize scaledSize;
-    QPixmap pix;
     std::vector<cv::Point2f> subCorners;
 };
 

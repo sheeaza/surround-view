@@ -10,12 +10,12 @@
 
 #include "cameraparameter.h"
 
-CameraCalibrator::CameraCalibrator(QObject *parent)
+CameraCalibrator::CameraCalibrator(CameraParameter &p, QObject *parent)
     : QObject(parent)
 {
-    boardSize = CameraParameter::boardSize;
-    squareSize = CameraParameter::squareSize;
-    imgSize = CameraParameter::imgSize;
+    boardSize = p.boardSize;
+    squareSize = p.squareSize;
+    imgSize = p.imgSize;
 }
 
 CameraCalibrator::~CameraCalibrator()

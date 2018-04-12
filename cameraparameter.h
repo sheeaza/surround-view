@@ -22,11 +22,12 @@ public:
     bool extrinsicReady;
     QString name;
     int devId;
-    static bool changed;
 
+    static bool changed;
     static cv::Size imgSize;
     static cv::Size boardSize;
     static float squareSize;
+    static float imageWidthToHeight;
 };
 
 #endif // CAMERAPARAMETER_H

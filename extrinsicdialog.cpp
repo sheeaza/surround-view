@@ -2,17 +2,19 @@
 #include "ui_extrinsicdialog.h"
 
 #include "calibratewidget.h"
+#include "cameraparameter.h"
+#include "aspectsinglelayout.h"
 
 #include <QRect>
 #include <QPoint>
 #include <QPainter>
+#include <QResizeEvent>
 
 ExtrinsicDialog::ExtrinsicDialog(cv::Mat &image,
                                  CameraParameter &p, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ExtrinsicDialog),
-    camPara(p),
-    found(0)
+    camPara(p)
 {
     ui->setupUi(this);
 
@@ -20,14 +22,17 @@ ExtrinsicDialog::ExtrinsicDialog(cv::Mat &image,
 
     image.copyTo(srcImage);
 
+    AspectSingleLayout *aspLayout =
+            new AspectSingleLayout(NULL, camPara.imageWidthToHeight);
+    ui->gridLayout->addLayout(aspLayout, 0, 0);
+    aspLayout->setContentsMargins(0, 0, 0, 0);
+    aspLayout->addWidget(ui->imageLabel);
+    aspLayout->setAlignment(ui->imageLabel, Qt::AlignCenter);
+
     QImage qImg;
     CalibrateWidget::matToQimage(srcImage, qImg);
-    QSize sz = ui->imageLabel->size();
-    QImage scaledImg(qImg.scaled(sz, Qt::KeepAspectRatio));
-    scaledSize = scaledImg.size();
-    pix = QPixmap::fromImage(scaledImg);
-    ui->imageLabel->setPixmap(pix);
-    scaleFactor = (float)(qImg.size().width()) / scaledSize.width();
+    ui->imageLabel->setPixmap(QPixmap::fromImage(qImg));
+    ui->imageLabel->setScaledContents(true);
 
     connect(ui->imageLabel, &ExtrinsicLabel::mouseReleased,
             this, &ExtrinsicDialog::findChessboardCorners);
@@ -38,20 +43,37 @@ ExtrinsicDialog::~ExtrinsicDialog()
     delete ui;
 }
 
+void ExtrinsicDialog::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+
+    if(isMaximized()) {
+        showNormal();
+    } else {
+        showMaximized();
+    }
+}
+
 void ExtrinsicDialog::findChessboardCorners(const QPoint &origin, const QPoint &end)
 {
-    if(found)
+    if(camPara.extrinsicReady)
         return;
 
     QPoint endBoundp = end;
-    endBoundp.rx() = qBound(0, endBoundp.x(), scaledSize.width()-1);
-    endBoundp.ry() = qBound(0, endBoundp.y(), scaledSize.height()-1);
+    QSize currentSize = ui->imageLabel->size();
+    float scaleFactor = (float)(camPara.imgSize.width) / currentSize.width();
+
+    endBoundp.rx() = qBound(0, endBoundp.x(), currentSize.width()-1);
+    endBoundp.ry() = qBound(0, endBoundp.y(), currentSize.height()-1);
 
     QRect qRectMask = QRect(origin * scaleFactor, endBoundp * scaleFactor).normalized();
 
     QPoint qorigin = qRectMask.topLeft();
     QSize qsize = qRectMask.size();
-
+    if(qsize.width() < 20 || qsize.height() < 20) {
+        qInfo() << "too small scanning area!";
+        return;
+    }
     cv::Point2f biasMain(qorigin.x(), qorigin.y());
     cv::Size mainRoiSize(qsize.width(), qsize.height());
     cv::Rect cvRectMask(biasMain, mainRoiSize);
@@ -80,7 +102,9 @@ void ExtrinsicDialog::findChessboardCorners(const QPoint &origin, const QPoint &
         vector<cv::Point2f> corners;
         bool cfound;
         cv::Point2f far, near;
+
         cfound = cv::findChessboardCorners(subChessBoardImgs[i], cv::Size(3, 3), corners);
+
         if(!cfound) {
             qInfo() << "corners not found!";
             subCorners.clear();
@@ -110,23 +134,18 @@ void ExtrinsicDialog::findChessboardCorners(const QPoint &origin, const QPoint &
         subCorners.push_back(near);
     }
 
-    found = true;
-
     for(size_t i = 2; i < subCorners.size(); ++i) {
         subCorners[i] += biasRight;
     }
 
-    QPainter painter(&pix);
-
     for(size_t i = 0; i < subCorners.size(); ++i) {
-        QPointF pos;
         subCorners[i] += biasMain;
-//        cv::circle(cvSrcImg, subCorners[i], 1, cv::Scalar(140, 155, 190), 1);
-        pos = QPointF(subCorners[i].x / scaleFactor,
-                       subCorners[i].y / scaleFactor);
-        painter.drawEllipse(pos, 5, 5);
+        cv::circle(cvSrcImg, subCorners[i], 5, cv::Scalar(140, 155, 190), 2);
     }
-    ui->imageLabel->setPixmap(pix);
+    QImage imgShow;
+    CalibrateWidget::matToQimage(cvSrcImg, imgShow);
+    ui->imageLabel->setPixmap(QPixmap::fromImage(imgShow));
+
     makeExtrinsic();
 }
 
@@ -175,11 +194,6 @@ void ExtrinsicDialog::makeExtrinsic()
     cv::fisheye::undistortPoints(subCorners, undistps,
                                  intrinsicTmp, camPara.cvDistCoeffs);
 
-//    for(uint i = 0; i < subCorners.size(); ++i) {
-//        subCorners[i].x = subCorners[i].x / (camPara.imgSize.width - 1);
-//        subCorners[i].y = subCorners[i].y / (camPara.imgSize.height - 1);
-//    }
-
     cv::Mat rvec, tvec, rmat, extrinsic;
 
     cv::solvePnP(objPoints, undistps, cv::Mat::eye(3, 3, CV_64F),
@@ -189,5 +203,18 @@ void ExtrinsicDialog::makeExtrinsic()
     extrinsic.copyTo(camPara.cvExtrinsic);
 
     camPara.extrinsicReady = true;
-    CameraParameter::changed = true;
+    camPara.changed = true;
+}
+
+void ExtrinsicDialog::on_resetButton_clicked()
+{
+    if(!camPara.extrinsicReady)
+        return;
+    camPara.extrinsicReady = false;
+    camPara.changed = true;
+    subCorners.clear();
+
+    QImage imgShow;
+    CalibrateWidget::matToQimage(srcImage, imgShow);
+    ui->imageLabel->setPixmap(QPixmap::fromImage(imgShow));
 }

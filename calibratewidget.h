@@ -32,6 +32,9 @@ signals:
     void sendSrcImage(cv::Mat *);
     void startCalibration();
 
+protected:
+    void mouseDoubleClickEvent(QMouseEvent *event);
+
 public slots:
     void foundChessboard(bool f);
 
