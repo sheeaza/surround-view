@@ -183,16 +183,9 @@ void ExtrinsicDialog::makeExtrinsic()
         objPoints[i] = (objPoints[i] - t3)*alpha;
     }
 
-    cv::Mat intrinsicTmp;
-    cv::Mat scale = cv::Mat::eye(3, 3, CV_64F);
-    scale.at<double>(0, 0) = camPara.imgSize.width;
-    scale.at<double>(1, 1) = camPara.imgSize.height;
-    camPara.cvIntrinsic.copyTo(intrinsicTmp);
-    intrinsicTmp = scale * intrinsicTmp;
-
     std::vector<cv::Point2f> undistps;
     cv::fisheye::undistortPoints(subCorners, undistps,
-                                 intrinsicTmp, camPara.cvDistCoeffs);
+                                 camPara.cvIntrinsic, camPara.cvDistCoeffs);
 
     cv::Mat rvec, tvec, rmat, extrinsic;
 

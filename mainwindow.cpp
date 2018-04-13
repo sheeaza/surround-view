@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     intrinsicAllReady(0),
     extrinsicAllReady(0),
-    curFile("./data/cameras.xml")
+    curFile(QApplication::applicationDirPath() + "/data/cameras.xml")
 {
     ui->setupUi(this);
 

@@ -140,7 +140,7 @@ void GpuRender::initializeGL()
 
     extrinsicLoc = glGetUniformLocation(programId, "extrinsic");
 
-    QString modelDir("./data/");
+    QString modelDir(QApplication::applicationDirPath() + "/data/");
     QVector<QString> modelName;
     modelName << "bowlfront.obj" << "bowlleft.obj"
               << "bowlback.obj" << "bowlright.obj";

@@ -77,7 +77,14 @@ void SurroundViewDialog::initQParameters()
     cv::Mat cvIntrinsicTmp, cvDistTmp, cvExtrinsicTmp;
 
     for(CameraParameter &item : camParas) {
-        item.cvIntrinsic.convertTo(cvIntrinsicTmp, CV_32F);
+        cv::Mat intrinsicTmp;
+        cv::Mat scale = cv::Mat::eye(3, 3, CV_64F);
+        scale.at<double>(0, 0) = 1.0 / item.imgSize.width;
+        scale.at<double>(1, 1) = 1.0 / item.imgSize.height;
+        item.cvIntrinsic.copyTo(intrinsicTmp);
+        intrinsicTmp = scale * intrinsicTmp;
+
+        intrinsicTmp.convertTo(cvIntrinsicTmp, CV_32F);
         item.cvDistCoeffs.convertTo(cvDistTmp, CV_32F);
         item.cvExtrinsic.convertTo(cvExtrinsicTmp, CV_32F);
 
